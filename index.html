@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<title>Order – Greenline Australia</title>
+<!-- R81 Greenline order page. Static: reads the order list ONLY from the link's #fragment (never sent to any server),
+     builds an email to orders@ and opens it in the customer's own email app (mailto:). No server code, no outside
+     files, fonts or services, no tracking, no cookies, no storage. -->
+<style>
+:root{--maroon:#4C1620;--ink:#2C1418;--mute:#6B5850;--line:#DCCDB8;--bg:#F2EAD9;--card:#FBF6EC;--mustard:#DFB648;--amber-l:#F8EDCF;--bad:#A8432A;--ok:#2F7D4F}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.4;-webkit-text-size-adjust:100%}
+header{background:var(--maroon);color:var(--bg);padding:14px 16px}
+header .in{max-width:640px;margin:0 auto;font-weight:800;font-size:19px;letter-spacing:-.01em}
+header .in span{display:block;font-weight:400;font-size:13px;opacity:.85;letter-spacing:0}
+main{max-width:640px;margin:0 auto;padding:14px 12px 40px;display:grid;gap:14px;min-width:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:10px;min-width:0}
+h1{margin:0;font-size:20px;line-height:1.25;color:var(--maroon)}
+h2{margin:6px 0 0;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mute)}
+p{margin:0}
+.muted{color:var(--mute)} .small{font-size:13px}
+.ref{font-size:13px;color:var(--mute)}
+.lines{display:grid;border:1px solid var(--line);border-radius:10px;background:#fff;overflow:hidden}
+.ln{display:grid;grid-template-columns:30px 24px minmax(0,1fr) 76px;gap:6px 8px;align-items:center;padding:10px;border-top:1px solid var(--line);cursor:pointer}
+.ln:first-child{border-top:0}
+.ln.on{background:var(--amber-l)}
+.ln input[type=checkbox]{width:24px;height:24px;margin:0;accent-color:var(--maroon);cursor:pointer}
+.ln .no{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.ln .code,.ln .usual{font-size:12px;color:var(--mute);overflow-wrap:anywhere}
+.ln .nm{font-weight:700;overflow-wrap:anywhere}
+.ln .qty{width:100%;min-height:44px;font:inherit;font-size:18px;text-align:center;border:1px solid var(--line);border-radius:8px;padding:4px;background:#fff;color:var(--ink)}
+label.f{display:grid;gap:4px;font-size:14px;color:var(--mute)}
+.input{width:100%;font:inherit;font-size:16px;padding:10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);min-height:44px}
+textarea.input{resize:vertical;min-height:70px}
+.row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.btn{appearance:none;border:0;border-radius:10px;background:var(--maroon);color:#F2EAD9;font:inherit;font-weight:700;font-size:17px;padding:14px 18px;min-height:52px;width:100%;cursor:pointer}
+.btn2{appearance:none;border:1.5px solid var(--maroon);border-radius:10px;background:var(--card);color:var(--maroon);font:inherit;font-weight:700;padding:12px 16px;min-height:48px;width:100%;cursor:pointer}
+.err{background:#F7E3DC;border:1px solid var(--bad);border-radius:8px;padding:10px 12px;color:var(--ink)}
+.ok{background:#DDF0E3;border:1px solid var(--ok);border-radius:10px;padding:12px 14px}
+.sum{white-space:pre-wrap;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:14px;overflow-wrap:anywhere}
+.acts{display:grid;gap:8px}
+footer{max-width:640px;margin:0 auto;padding:0 16px 30px;font-size:13px;color:var(--mute)}
+footer a{color:var(--maroon)}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header><div class="in">Greenline Australia<span>Order online</span></div></header>
+<main id="main">
+  <div class="card" id="bad" hidden>
+    <h1>This link isn't complete</h1>
+    <p>Please reply to our email instead – just write the line numbers and quantities, e.g. 1x2, 3x1.</p>
+    <p class="small muted">Or email <a href="mailto:orders@greenlineaustralia.com.au">orders@greenlineaustralia.com.au</a>.</p>
+  </div>
+  <form id="form" hidden novalidate>
+    <div class="card">
+      <h1 id="hi">Hi – tick what you'd like and set the quantity</h1>
+      <p class="ref" id="ref"></p>
+      <div class="lines" id="main-lines"></div>
+      <h2 id="also-h" hidden>You've also ordered</h2>
+      <div class="lines" id="also-lines" hidden></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <label class="f">+ Something else (a different size, another product…)<textarea class="input" id="also" maxlength="500" rows="2"></textarea></label>
+      <div class="row2">
+        <label class="f">Preferred delivery date<input class="input" id="date" type="date"></label>
+        <label class="f">PO number (if you use one)<input class="input" id="po" maxlength="60" autocomplete="off"></label>
+      </div>
+      <label class="f">Notes<textarea class="input" id="notes" maxlength="500" rows="2"></textarea></label>
+      <div class="err" id="err" hidden></div>
+      <div class="acts">
+        <button class="btn" id="send" type="submit">Send order</button>
+        <p class="small muted">This opens your email app with the order ready to go – you press Send.</p>
+      </div>
+    </div>
+  </form>
+  <div class="card" id="done" hidden>
+    <div class="ok"><b>Your email app has opened – press Send to place the order.</b></div>
+    <p class="small muted">Nothing opened, or you use webmail (Gmail, Outlook on the web)? Copy the order and paste it into a reply to our email.</p>
+    <div class="sum" id="sum"></div>
+    <div class="acts">
+      <button class="btn2" id="copy" type="button">Copy order</button>
+      <button class="btn2" id="again" type="button">Open the email again</button>
+      <button class="btn2" id="back" type="button">Change the order</button>
+    </div>
+    <p class="small" id="copied" role="status"></p>
+  </div>
+</main>
+<footer>Greenline Australia · <a href="mailto:orders@greenlineaustralia.com.au">orders@greenlineaustralia.com.au</a><br>This page doesn't store or send anything – your order goes by email from your own email app.</footer>
+<script>
+(function(){
+  "use strict";
+  var TO = "orders@greenlineaustralia.com.au";
+  var $ = function(id){ return document.getElementById(id); };
+  function el(tag, cls, txt){ var x = document.createElement(tag); if(cls) x.className = cls; if(txt != null) x.textContent = txt; return x; }
+
+  /* ---- read the order list from the #fragment: base64url JSON {r, a, g, l:[[no, code, name, size, usual, group]]} ---- */
+  function readData(){
+    try{
+      var h = (location.hash || "").replace(/^#/, ""); if(!h) return null;
+      h = h.replace(/-/g, "+").replace(/_/g, "/"); while(h.length % 4) h += "=";
+      var bin = atob(h), bytes = new Uint8Array(bin.length);
+      for(var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      var d = JSON.parse(new TextDecoder("utf-8").decode(bytes));
+      if(!d || typeof d.r !== "string" || !/^RC-\d{2}-\d{3,6}$/.test(d.r) || !Array.isArray(d.l) || !d.l.length) return null;
+      var lines = [];
+      for(var k = 0; k < d.l.length; k++){
+        var x = d.l[k]; if(!Array.isArray(x)) return null;
+        var no = parseInt(x[0], 10); if(!(no > 0)) return null;
+        var u = Math.round(+x[4] || 0);
+        lines.push({no: no, code: String(x[1] || ""), name: String(x[2] || ""), size: String(x[3] || ""), usual: u > 0 ? u : 1, also: +x[5] === 1});
+      }
+      return {ref: d.r, acc: String(d.a || ""), greet: String(d.g || "").trim(), lines: lines};
+    }catch(e){ return null; }
+  }
+  var D = readData();
+  if(!D){ $("bad").hidden = false; return; }
+  document.title = "Order – " + (D.acc || "Greenline Australia");
+  $("hi").textContent = "Hi" + (D.greet && D.greet !== "there" ? " " + D.greet : "") + " – tick what you'd like and set the quantity";
+  $("ref").textContent = (D.acc ? D.acc + " · " : "") + "Ref " + D.ref;
+  var today = new Date(), pad = function(n){ return String(n).padStart(2, "0"); };
+  $("date").min = today.getFullYear() + "-" + pad(today.getMonth() + 1) + "-" + pad(today.getDate());
+
+  /* ---- one row per line: [tick] [no.] code / name + size / usually N [qty] ---- */
+  function row(L){
+    var r = el("div", "ln");
+    var cb = el("input"); cb.type = "checkbox"; cb.id = "c" + L.no; cb.setAttribute("aria-label", "Order line " + L.no + " " + (L.name || L.code) + " " + L.size);
+    var no = el("span", "no", String(L.no));
+    var mid = el("span"); mid.style.minWidth = "0";
+    if(L.code){ mid.appendChild(el("span", "code", L.code)); mid.appendChild(document.createElement("br")); }
+    mid.appendChild(el("span", "nm", (L.name ? L.name + " " : "") + L.size));
+    mid.appendChild(document.createElement("br")); mid.appendChild(el("span", "usual", "usually " + L.usual));
+    var q = el("input", "qty"); q.type = "number"; q.id = "q" + L.no; q.min = "1"; q.max = "999"; q.step = "1"; q.inputMode = "numeric"; q.placeholder = "–";
+    q.setAttribute("aria-label", "Quantity for line " + L.no);
+    var sync = function(){ r.classList.toggle("on", cb.checked); };
+    var tick = function(on){ cb.checked = on; if(on && !(+q.value >= 1)) q.value = String(L.usual); if(!on) q.value = ""; sync(); };
+    cb.addEventListener("change", function(){ tick(cb.checked); });
+    q.addEventListener("focus", function(){ if(!cb.checked){ tick(true); setTimeout(function(){ try{ q.select(); }catch(e){} }, 0); } });   /* typing replaces the filled-in usual qty */
+    q.addEventListener("input", function(){ if(+q.value >= 1 && !cb.checked){ cb.checked = true; sync(); } });
+    r.addEventListener("click", function(e){ if(e.target === cb || e.target === q) return; tick(!cb.checked); });
+    L.cb = cb; L.q = q;
+    r.appendChild(cb); r.appendChild(no); r.appendChild(mid); r.appendChild(q);
+    return r;
+  }
+  var mainL = D.lines.filter(function(L){ return !L.also; }), alsoL = D.lines.filter(function(L){ return L.also; });
+  mainL.forEach(function(L){ $("main-lines").appendChild(row(L)); });
+  if(!mainL.length) $("main-lines").hidden = true;
+  if(alsoL.length){ $("also-h").hidden = false; $("also-lines").hidden = false; alsoL.forEach(function(L){ $("also-lines").appendChild(row(L)); }); }
+  $("form").hidden = false;
+
+  /* ---- the email, in the format the Greenline reply reader understands ---- */
+  var DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], MONS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  function oneLine(s){ return String(s || "").replace(/\r/g, "").split("\n").map(function(x){ return x.trim(); }).filter(Boolean).join(" / "); }
+  function build(){
+    var picked = D.lines.filter(function(L){ return L.cb.checked && Math.floor(+L.q.value) >= 1; });
+    var also = oneLine($("also").value), notes = oneLine($("notes").value), po = oneLine($("po").value), dv = $("date").value;
+    var out = [];
+    if(picked.length) out.push("Order: " + picked.map(function(L){ return L.no + "x" + Math.floor(+L.q.value); }).join(", "));
+    if(/^\d{4}-\d{2}-\d{2}$/.test(dv)){ var p = dv.split("-"), d = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])); out.push("Deliver: " + DAYS[d.getUTCDay()] + " " + d.getUTCDate() + " " + MONS[d.getUTCMonth()] + " " + d.getUTCFullYear()); }
+    if(po) out.push("PO: " + po);
+    if(also) out.push("Also: " + also);
+    if(notes) out.push("Notes: " + notes);
+    out.push("(Sent from the Greenline order page)");
+    return {picked: picked, also: also, body: out.join("\n"), subject: "Re: Time to restock? " + D.acc + " – Ref " + D.ref};
+  }
+  function mailto(b){ return "mailto:" + TO + "?subject=" + encodeURIComponent(b.subject) + "&body=" + encodeURIComponent(b.body.replace(/\n/g, "\r\n")); }
+  var last = null;
+  $("form").addEventListener("submit", function(e){
+    e.preventDefault(); var err = $("err"); err.hidden = true;
+    var bad = D.lines.filter(function(L){ return L.cb.checked && !(Math.floor(+L.q.value) >= 1); });
+    if(bad.length){ err.textContent = "Line " + bad[0].no + " is ticked – please put a quantity of 1 or more."; err.hidden = false; bad[0].q.focus(); return; }
+    var b = build();
+    if(!b.picked.length && !b.also){ err.textContent = "Please tick at least one product (with a quantity), or write what you need under \"Something else\"."; err.hidden = false; return; }
+    last = b; $("sum").textContent = b.body; $("copied").textContent = "";
+    $("form").hidden = true; $("done").hidden = false; window.scrollTo(0, 0);
+    location.href = mailto(b);   /* opens the email app; this page stays */
+  });
+  $("again").addEventListener("click", function(){ if(last) location.href = mailto(last); });
+  $("back").addEventListener("click", function(){ $("done").hidden = true; $("form").hidden = false; });
+  $("copy").addEventListener("click", function(){
+    if(!last) return; var t = last.body, msg = $("copied");
+    var done = function(ok){ msg.textContent = ok ? "Copied – paste it into a reply to our email (keep the subject with the Ref " + D.ref + ")." : "Couldn't copy – please select the text above and copy it."; };
+    var fallback = function(){ try{ var ta = el("textarea"); ta.value = t; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, t.length); var ok = document.execCommand("copy"); ta.remove(); done(ok); }catch(e){ done(false); } };
+    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function(){ done(true); }, fallback); else fallback();
+  });
+  window.__order = {data: D, build: build, mailto: mailto};   /* for testing only */
+})();
+</script>
+</body>
+</html>
