@@ -7,7 +7,9 @@
 <meta name="robots" content="noindex, nofollow">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
 <title>Order – Greenline Australia</title>
-<!-- R81 Greenline order page, v2 (24 Nov 2026). Static: reads the order list ONLY from the link's #fragment (never sent
+<!-- R85 (25 Nov 2026): short links "#2~…" (see OLink below) + embedded product catalogue (code → name, size; no prices),
+     regenerated from Dynamics with r85/build_catalogue.py. Old base64 links (R81) still open.
+     R81 Greenline order page, v2 (24 Nov 2026). Static: reads the order list ONLY from the link's #fragment (never sent
      to any server), builds an email to orders@ and opens it in the email app the customer CHOOSES (Outlook, Gmail, the
      phone's own mail app) or lets them copy it. No server code, no outside files, fonts or services, no tracking,
      no cookies, no storage. -->
@@ -109,7 +111,66 @@ textarea.input{resize:vertical;min-height:64px}
   var $ = function(id){ return document.getElementById(id); };
   function el(tag, cls, txt){ var x = document.createElement(tag); if(cls) x.className = cls; if(txt != null) x.textContent = txt; return x; }
 
-  /* ---- read the order list from the #fragment: base64url JSON {r, a, g, l:[[no, code, name, size, usual, group]]} ---- */
+  /* ---- product catalogue from Dynamics (r85/build_catalogue.py): code → [name, size] ---- */
+  var CAT = /*@@CAT*/{"1010-500ML-EMPTY":["Mist Spray (empty bottle)","500ml"],"1010EU-20LTR":["Mist Spray – Eucalyptus","20L"],"1010EU-5LTR":["Mist Spray – Eucalytpus","5L"],"1010LM-20LTR":["Mist Spray – Lemon Myrtle","20L"],"1010LV-5LTR":["Mist Spray – Lavender","5L"],"1020LM-20LTR":["Linen Spray – Lemon Myrtle","20L"],"1020LM-500ML":["Linen Spray – Lemon Myrtle","500ml"],"1020LM-500ML-EMPTY":["Linen Spray (empty bottle)","500ml"],"1020LM-5LTR":["Linen Spray – Lemon Myrtle","5L"],"2101-20LTR":["Fabric Softener","20L"],"2101-5LTR":["Fabric Softener","5L"],"2101-EMPTY-5LTR":["Fabric Softener (empty bottle)","5L"],"2101EU-20LTR":["Fabric Softener + Eucalyptus","20L"],"2101EU-5LTR":["Fabric Softener + Eucalyptus","5L"],"2101LV-20LTR":["Fabric Softener + Lavender","20L"],"2101LV-5LTR":["Fabric Softener + Lavender","5L"],"2102EU-SC-20LTR":["Fabric Softener + Eucalyptus","20L"],"2102LV-SC-20LTR":["Fabric Softener + Lavender","20L"],"2102-SC-20LTR":["Fabric Softener + No Scent","20L"],"3315-1LTR":["Bathroom & Shower Cleaner","1L"],"3315-20LTR":["Bathroom & Shower Cleaner","20L"],"3315-500ML":["Bathroom & Shower Cleaner","500ml"],"3315-5LTR":["Bathroom & Shower Cleaner","5L"],"3315-EMPTY-20L":["Bathroom & Shower Cleaner (empty bottle)","20L"],"3315-EMPTY-500ML":["Bathroom & Shower Cleaner (empty bottle)","500ml"],"3315-EMPTY-5LTR":["Bathroom & Shower Cleaner (empty bottle)","5L"],"3315EU-SC-20LTR":["Bathroom Cleaner + Eucalyptus","20L"],"3315RG-SC-20LTR":["Bathroom Cleaner + Rose Geranium","20L"],"3315S-500ML":["Bathroom & Shower Cleaner","500ml"],"3316-500ML":["Bathroom & Shower Cleaner Extra Strength","500ml"],"3316EU-SC-20LTR":["Toilet Cleaner + Eucalyptus","20L"],"3316LV-SC-20LTR":["Toilet Cleaner + Lavender","20L"],"3316RG-SC-20LTR":["Toilet Cleaner + Rose Geranium","20L"],"3318-1LTR":["Coffee Machine Cleaner Concentrate","1L"],"3318-20LTR":["Coffee Machine Cleaner Concentrate","20L"],"3318-5LTR":["Coffee Machine Cleaner Concentrate","5L"],"3319EU-SC-20LTR":["Mould Cleaner + Eucalyptus","20L"],"3319LV-SC-20LTR":["Mould Cleaner + Lavender","20L"],"3319RG-SC-20LTR":["Mould Cleaner + Rose Geranium","20L"],"3319-SC-20LTR":["Mould Cleaner + No Scent","20L"],"3351-EMPTY-500ML":["3351 (empty bottle)","500ml"],"3351EU-SC-20LTR":["Bathroom Cleaner + Eucalyptus","20L"],"3351LV-SC-20LTR":["Bathroom Cleaner + Lavender","20L"],"3351RG-5LTR":["Bathroom & Shower Cleaner + Rose Geranium","5L"],"3351RG-SC-20LTR":["Bathroom Cleaner + Rose Geranium","20L"],"3362-1LTR":["Limescale Remover","1L"],"3362-200LTR":["Limescale Remover","200L"],"3362-20LTR":["Limescale Remover","20L"],"3362-500ML":["Limescale Remover","500ml"],"3362-5LTR":["Limescale Remover","5L"],"3362-EMPTY-500ML":["Limescale Remover (empty bottle)","500ml"],"3362-EMPTY-5L":["Limescale Remover (empty bottle)","5L"],"3362RC-20LTR":["Rinse Care and Scale Remover","20L"],"3362RC-5LTR":["Rinse Care and Scale Remover","5L"],"3362S-1LTR":["Limescale Remover","1L"],"3362S-500ML":["Limescale Remover","500ml"],"3713-1LTR":["Rust Remover","1L"],"3713-20LTR":["Rust Remover","20L"],"3713-500ML":["Rust Remover","500ml"],"3713-5LTR":["Rust Remover","5L"],"3713-EMPTY-500ML":["Rust Remover (empty bottle)","500ml"],"3990-1LTR":["Surface Cleaner & Sanitiser","1L"],"3990-20LTR":["Surface Cleaner & Sanitiser","20L"],"3990-500ML":["Surface Cleaner & Sanitiser","500ml"],"3990-500ML-EMPTY":["Surface Cleaner & Sanitiser (empty bottle)","500ml"],"3990-5L-EMPTY":["Surface Cleaner & Sanitiser (empty bottle)","5L"],"3990-5LTR":["Surface Cleaner & Sanitiser","5L"],"3990S-500ML":["Surface Cleaner & Sanitiser","500ml"],"3990-SC-20LTR":["Surface Cleaner & Sanitiser","20L"],"3991-500ML":["Surface Cleaner & Sanitiser","500ml"],"6002-1LTR":["Agricultural Degreaser","1L"],"6002-200LTR":["Agricultural Degeaser","200L"],"6002-20LTR":["Agricultural Degreaser","20L"],"6002-5L-EMPTY+Tap":["Agricultural Degreaser (empty bottle)","5L"],"6002-5LTR":["Agricultural Degreaser","5L"],"6002-5LTR-EMPTY+Pump":["Agricultural Degreaser (empty bottle)","5L"],"6002-EMPTY-500ML":["Agricultural Degreaser (empty bottle)","500ml"],"6002S-1LTR":["Agricultural Degreaser","1L"],"6002S-20LTR":["Agricultural Degrease","20L"],"6002S-500ML":["Mattress Cleaner","500ml"],"6011-20LTR":["Industrial Strength Degreaser","20L"],"6011-500ML":["Industrial Grade Degreaser","500ml"],"6011-500ML-EMPTY":["Industrial Strength Degreaser (empty bottle)","500ml"],"6011-5LTR":["Industrial Strength Degreaser","5L"],"6022-1LTR":["Food Grade Degreaser & Sanitiser","1L"],"6022-20L-EMPTY":["Food Grade Degreaser (empty bottle)","20L"],"6022-20LTR":["Food Grade Degreaser & Sanitiser","20L"],"6022-500ML":["Food Grade Degreaser & Sanitiser","500ml"],"6022-5L-EMPTY":["Food Grade Degreaser & Sanitiser (empty bottle)","5L"],"6022-5LTR":["Food Grade Degreaser & Sanitiser","5L"],"6022-EMPTY-500ML":["Food Grade Degreaser & Sanitiser (empty bottle)","500ml"],"6022S-500ML":["Food Grade Degreaser & Sanitiser","500ml"],"6022-SC-20LTR":["Kitchen Degreaser","20L"],"6022SLM-500ML":["Food Grade Degreaser & Sanitiser + Lemon Myrtle","500ml"],"6023-1LTR":["Heavy Duty All Puropse Degreaser","1L"],"6023-20LTR":["Heavy Duty All-Purpose Degreaser","20L"],"6023-5LTR":["Heavy Duty All-Purpose Degreaser","5L"],"6023-EMPTY-500ML":["500ML (empty bottle)","500ml"],"6043-1LTR":["Fruit & Vegetable Wash","1L"],"6043-20LTR":["Fruit & Vegetable Wash","20L"],"6043-5LTR":["Fruit & Vegetable Wash","5L"],"6043DW-20LTR":["Dishwashing Machine Concentrate","20L"],"6043DW-5LTR":["Dishwashing Machine Concentrate","5L"],"6044-SC-20LTR":["Fruit & Vegetable Wash","20L"],"6051-500ML":["Food Grade Degreaser & Sanitiser","500ml"],"6111-5LTR":["Bed Mattress Cleaner","5L"],"6111-EMPTY-500ML":["6111 – Bed Mattress Cleaner (empty bottle)","500ml"],"6209-1LTR":["Industrial Strength Soot Remover","1L"],"6209-20LTR":["Industrial Strength Soot Remover","20L"],"6209-500ML":["Industrial Strength Soot Remover","500ml"],"6209-5LTR":["Industrial Strength Soot Remover","5L"],"6209-EMPTY-500ML":["6209 (empty bottle)","500ml"],"6815-20LTR":["Laundry Liquid Concentrate","20L"],"6815-5L-EMPTY":["Laundry Liquid Concentrate (empty bottle)","5L"],"6815-5LTR":["Laundry Liquid Concentrate","5L"],"6815EU-20LTR":["Laundry Liquid Concentrate + Eucalyptus","20L"],"6815EU-5LTR":["Laundry Liquid Concentrate + Eucalyptus","5L"],"6815EU-SC-20LTR":["Laundry Liquid + Eucalyptus","20L"],"6815LM-20LTR":["Laundry Liquid Concentrate + Lemon Myrtle","20L"],"6815LV-20LTR":["Laundry Liquid Concentrate + Lavender","20L"],"6815LV-5LTR":["Laundry Liquid Concentrate + Lavender","5L"],"6815LV-SC-20LTR":["Laundry Liquid + Lavender","20L"],"6815RG-SC-20LTR":["Laundry Liquid + Rose Geranium","20L"],"6815-SC-20LTR":["Laundry Liquid – No Scent","20L"],"7076-500ML":["Multipurpose Super Concentrate","500ml"],"7077-20LTR":["Multipurpose Cleaner Concentrate","20L"],"7077-5L-EMPTY+Tap":["Multipurpose Cleaner Concentrate (empty bottle)","5L"],"7077-5LTR":["Multipurpose Cleaner Concentrate","5L"],"7077DW-20LTR":["Dishwashing Machine Concentrate","20L"],"7077DW-5LTR":["Dishwashing Machine Concentrate","5L"],"7077DW-Empty-5LTR+Tap":["Dishwashing Machine Concentrate (empty bottle)","5L"],"7077-EMPTY-1L":["Multipurpose Cleaner Concentrate (empty bottle)","1L"],"7077-EMPTY-500ML":["Multipurpose Cleaner Concentrate (empty bottle)","500ml"],"7077-EMPTY-5L":["Multipurpose Cleaner Concentrate (empty bottle)","5L"],"7077EU-20LTR":["Multipurpose Cleaner Concentrate + Eucalyptus","20L"],"7077EU-5LTR":["Multipurpose Cleaner Concentrate + Eucalyptus","5L"],"7077EU-SC-20LTR":["Floor Cleaner + Eucalyptus","20L"],"7077LM-20LTR":["Multipurpose Cleaner Concentrate + Lemon Myrtle","20L"],"7077LV-20LTR":["Multipurpose Cleaner Concentrate + Lavender","20L"],"7077LV-5LTR":["Multipurpose Cleaner Concentrate + Lavender","5L"],"7077LV-SC-20LTR":["Floor Cleaner + Lavender","20L"],"7077RG-SC-20LTR":["Floor Cleaner + Rose Geranium","20L"],"7077S-500ML":["Multipurpose Concentrate","500ml"],"7077SEU-500ML":["Multipurpose Concentrate + Eucalyptus","500ml"],"7077SLAV-500ML":["Multipurpose Concentrate + Lavender","500ml"],"7077SLM-500ML":["Multipurpose Cleaner Concentrate + Lemon Myrtle","500ml"],"7077SRG-500ML":["Multipurpose Concentrate + ROSE GERANIUM","500ml"],"7460-20LTR":["Glass & Window Cleaner","20L"],"7460-500ML":["Glass & Window Cleaner","500ml"],"7460-5LTR":["Glass & Window Cleaner","5L"],"7460-EMPTY-500ML":["Glass & Window Cleaner (empty bottle)","500ml"],"7460-EMPTY-5L+TAP":["Glass & Window Cleaner (empty bottle)","5L"],"7460S-500ML":["Glass & Window Cleaner","500ml"],"7460-SC-20LTR":["Glass Cleaner","20L"],"7460SLM-500ML":["Glass & Window Cleaner + Lemon Myrtle","500ml"],"7721-500ML":["Multipurpose Cleaner","500ml"],"7721EU-SC-20LTR":["Multipurpose Surface Cleaner + Eucalyptus","20L"],"7721LV-SC-20LTR":["Multipurpose Surface Cleaner + Lavender","20L"],"7721RG-SC-20LTR":["Multipurpose Surface Cleaner + Rose Geranium","20L"],"7788-1LTR":["Multipurpose Surface Cleaner","1L"],"7788-20LTR":["Multipurpose Surface Cleaner","20L"],"7788-500ML":["Multipurpose Surface Cleaner","500ml"],"7788-5LTR":["Multipurpose Surface Cleaner","5L"],"7788-EMPTY-500ML":["7788 – Multipurpose Cleaner (RTU) (empty bottle)","500ml"],"7788-Empty-5LTR":["Multipurpose Cleaner (empty bottle)","5L"],"7788SLM-500ML":["Multipurpose Cleaner + Lemon Myrtle","500ml"],"PUMP 38MM8PB":["38mm Lotion Pump Longer Stem",""],"PUMP28MM4":["28mm Lotion Pump 4ml",""],"PUMP38MM30":["Pump Dispenser","5L"],"PUMP58MM30":["Pump Dispenser","20L"],"SP20LTR":["Spanner","20L"],"TAP20MMJUMNOZ":["Tap Dispenser","20L"],"TAP38MMIAC":["Tap Dispenser","5L"],"Trigg-500ML":["Trigger Spray – For 500ML Bottles","500ml"]}/*CAT@@*/;
+/* R85 short order link – shared by the order page (decoder), gl_/buying.html (encoder) and the tests.
+   Format:  https://order.greenlineaustralia.com.au/#2~<ref without "RC-">~E(account)~E(greeting)~<main>[~<also>[~<names>]]
+     main / also : tokens joined by "."; token = C(code) or "*" (no code), plus "_<qty>" when the usual qty is not 1
+                   C(code) = E(code) with the common endings shortened: "-SC-20LTR" → "!", "-20LTR" → "(", "-5LTR" → ")"
+                   (E never outputs ! ( ), so this is exact); a link ending in ! ( ) gets a "~" so phones don't trim it
+                   line numbers are implicit: main lines are 1..m, "also" lines m+1..n (the encoder checks this, else returns "")
+     names       : only for lines with NO code: "<lineNo>_E(name)_E(size)" joined by "."
+   E(s) = RFC 3986 escape (= Power Automate encodeUriComponent) with %20 → "+", and . _ ~ ! ' ( ) * escaped,
+          so "~" "." "_" "*" are free to use as separators. The R67 flow builds exactly the same string. */
+var OLink = (function () {
+  'use strict';
+  var BASE = 'https://order.greenlineaustralia.com.au/#';
+  function E(s) {
+    return encodeURIComponent(String(s == null ? '' : s))
+      .replace(/[!'()*]/g, function (c) { return '%' + c.charCodeAt(0).toString(16).toUpperCase(); })
+      .replace(/%20/g, '+').replace(/\./g, '%2E').replace(/_/g, '%5F').replace(/~/g, '%7E');
+  }
+  function C(code) { return E(code).split('-SC-20LTR').join('!').split('-20LTR').join('(').split('-5LTR').join(')'); }
+  function unC(t) { return t.split('!').join('-SC-20LTR').split('(').join('-20LTR').split(')').join('-5LTR'); }
+  function D(s) { return decodeURIComponent(String(s).replace(/\+/g, ' ')); }
+  function qtyOf(u) { var n = (u == null || u === '') ? 1 : +u; n = isFinite(n) ? Math.round(n) : 1; return Math.max(1, n); }
+  /* c = {ref:"RC-26-1017", acc, greet, lines:[{no, code, label, size, usual, also}]} → link, or "" when the lines aren't numbered 1..n main-then-also */
+  function encode(c) {
+    var L = (c.lines || []).slice().sort(function (a, b) { return a.no - b.no; });
+    var main = L.filter(function (x) { return !x.also; }), also = L.filter(function (x) { return !!x.also; });
+    var ok = main.concat(also).every(function (x, i) { return +x.no === i + 1; });
+    if (!ok || !L.length) return '';
+    function tok(x) { var q = qtyOf(x.usual); return (x.code ? C(x.code) : '*') + (q === 1 ? '' : '_' + q); }
+    var mt = main.map(tok), at = also.map(tok);
+    var nm = L.filter(function (x) { return !x.code; }).map(function (x) { return x.no + '_' + E(x.label || '') + '_' + E(x.size || ''); });
+    var v = BASE + '2~' + String(c.ref || '').replace('RC-', '') + '~' + E(c.acc || '') + '~' + E(c.greet || '') + '~' + mt.join('.') +
+      (at.length || nm.length ? '~' + at.join('.') : '') + (nm.length ? '~' + nm.join('.') : '');
+    return /[!()]$/.test(v) ? v + '~' : v;
+  }
+  /* fragment (without "#") → {ref, acc, greet, lines:[{no, code, name, size, usual, also}]} or null.  cat = {code:[name,size]} */
+  function decode(h, cat) {
+    try {
+      if (h.slice(0, 2) !== '2~') return null;
+      var f = h.split('~'); if (f.length === 8 && f[7] === '') f.pop(); if (f.length < 5 || f.length > 7) return null;
+      var ref = 'RC-' + f[1]; if (!/^RC-\d{2}-\d{3,6}$/.test(ref)) return null;
+      var names = {};
+      (f[6] || '').split('.').forEach(function (t) { if (!t) return; var p = t.split('_'); if (p.length === 3 && /^\d{1,3}$/.test(p[0])) names[+p[0]] = [D(p[1]), D(p[2])]; });
+      var lines = [], no = 0, bad = false;
+      [[f[4], false], [f[5] || '', true]].forEach(function (g) {
+        g[0].split('.').forEach(function (t) {
+          if (!t) return; var p = t.split('_'); if (p.length > 2 || (p.length === 2 && !/^\d{1,3}$/.test(p[1]))) { bad = true; return; }
+          no++; var code = p[0] === '*' ? '' : D(unC(p[0])), c = code && cat && Object.prototype.hasOwnProperty.call(cat, code) ? cat[code] : null, n = names[no];
+          lines.push({no: no, code: code, name: c ? c[0] : (n ? n[0] : code), size: c ? c[1] : (n ? n[1] : ''), usual: p.length === 2 ? Math.max(1, +p[1]) : 1, also: g[1], known: !!c});
+        });
+      });
+      if (bad || !lines.length) return null;
+      return {ref: ref, acc: D(f[2]), greet: D(f[3]).trim(), lines: lines};
+    } catch (e) { return null; }
+  }
+  return {E: E, C: C, encode: encode, decode: decode, qtyOf: qtyOf, BASE: BASE};
+})();
+
+  /* ---- OLD links (R81, emails already sent): base64url JSON {r, a, g, l:[[no, code, name, size, usual, group]]} ---- */
   function readData(){
     try{
       var h = (location.hash || "").replace(/^#/, ""); if(!h) return null;
@@ -128,7 +189,12 @@ textarea.input{resize:vertical;min-height:64px}
       return {ref: d.r, acc: String(d.a || ""), greet: String(d.g || "").trim(), lines: lines};
     }catch(e){ return null; }
   }
-  var D = readData();
+  function readAny(){
+    var h = (location.hash || "").replace(/^#/, "");
+    if(h.slice(0, 2) === "2~"){ var d = OLink.decode(h, CAT); return d; }
+    return readData();
+  }
+  var D = readAny();
   if(!D){ $("bad").hidden = false; return; }
   document.title = "Order – " + (D.acc || "Greenline Australia");
   $("hi").textContent = "Hi " + (D.greet || "there") + " – put the quantity you need next to each product.";
@@ -144,7 +210,7 @@ textarea.input{resize:vertical;min-height:64px}
     var r = el("div", "ln");
     var no = el("span", "no", String(L.no));
     var nm = el("div", "nm"); if(L.name) nm.appendChild(document.createTextNode(L.name + " ")); nm.appendChild(el("b", null, L.size));
-    var code = el("div", "code", L.code || "");
+    var code = el("div", "code", L.code && L.code !== L.name ? L.code : "");   /* unknown code: the code is shown once, as the name */
     var meta = el("div", "meta", "usually " + L.usual);
     var st = el("div", "step");
     var minus = el("button", null, "−"); minus.type = "button"; minus.setAttribute("aria-label", "Less of line " + L.no);
@@ -179,7 +245,7 @@ textarea.input{resize:vertical;min-height:64px}
     var also = oneLine($("also").value), notes = oneLine($("notes").value), po = oneLine($("po").value), dv = $("date").value;
     /* a proper order email; the Greenline reply reader uses "(code, line N)" on each product and the Ref line at the end */
     var out = ["Hi Greenline,", "", "Please supply the following" + (D.acc ? " for " + D.acc : "") + ":", ""];
-    picked.forEach(function(L){ out.push(qOf(L) + " x " + (L.name ? L.name + " " : "") + L.size + " (" + (L.code ? L.code + ", " : "") + "line " + L.no + ")"); });
+    picked.forEach(function(L){ var t = [L.name && L.name !== L.code ? L.name : "", L.size].filter(Boolean).join(" "); out.push(qOf(L) + " x " + (t ? t + " " : "") + "(" + (L.code ? L.code + ", " : "") + "line " + L.no + ")"); });
     if(also) out.push("Also: " + also);
     out.push("");
     if(/^\d{4}-\d{2}-\d{2}$/.test(dv)){ var p = dv.split("-"), d = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])); out.push("Delivery date: " + DAYS[d.getUTCDay()] + " " + d.getUTCDate() + " " + MONS[d.getUTCMonth()] + " " + d.getUTCFullYear()); }
