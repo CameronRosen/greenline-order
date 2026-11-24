@@ -94,8 +94,7 @@ textarea.input{resize:vertical;min-height:64px}
   <div id="pick" hidden style="display:grid;gap:12px">
     <div class="ok" id="opened"></div>
     <div class="sum" id="sum"></div>
-    <h2>Didn't open, or opened the wrong email app?</h2>
-    <div class="opts" id="opts"></div>
+    <div class="opts"><button class="opt" id="copy" type="button"><div>Copy the order<span>Nothing opened? Paste it into a reply to our email</span></div></button></div>
     <p class="small" id="copied" role="status"></p>
     <button class="link" id="back" type="button" style="justify-self:start">‹ Change the order</button>
   </div>
@@ -192,45 +191,15 @@ textarea.input{resize:vertical;min-height:64px}
     return {picked: picked, also: also, body: out.join("\n"), subject: "Re: Time to restock? " + D.acc + " – Ref " + D.ref};
   }
 
-  /* ---- where to send it: the customer picks the app; nothing opens until they choose ---- */
-  var E = encodeURIComponent, UA = navigator.userAgent || "";
-  var isAndroid = /Android/i.test(UA), isIOS = /iPhone|iPad|iPod/i.test(UA) || (/Macintosh/.test(UA) && navigator.maxTouchPoints > 1);
-  function q3(b){ return "subject=" + E(b.subject) + "&body=" + E(b.body.replace(/\n/g, "\r\n")); }
-  function mailto(b){ return "mailto:" + TO + "?" + q3(b); }
-  function androidApp(b, pkg){ return "intent:" + TO + "?" + q3(b) + "#Intent;scheme=mailto;package=" + pkg + ";end"; }
-  var OPTS = isAndroid ? [
-      {k: "outlook", t: "Outlook", s: "The Outlook app", u: function(b){ return androidApp(b, "com.microsoft.office.outlook"); }},
-      {k: "gmail", t: "Gmail", s: "The Gmail app", u: function(b){ return androidApp(b, "com.google.android.gm"); }},
-      {k: "other", t: "Open my email app again", s: "Your phone's usual email app", u: mailto},
-      {k: "copy", t: "Copy the order", s: "Paste it into a reply to our email"}
-    ] : isIOS ? [
-      {k: "outlook", t: "Outlook", s: "The Outlook app", u: function(b){ return "ms-outlook://compose?to=" + E(TO) + "&" + q3(b); }},
-      {k: "gmail", t: "Gmail", s: "The Gmail app", u: function(b){ return "googlegmail://co?to=" + E(TO) + "&" + q3(b); }},
-      {k: "mail", t: "Open my email app again", s: "Your usual email app (Mail)", u: mailto},
-      {k: "copy", t: "Copy the order", s: "Paste it into a reply to our email"}
-    ] : [
-      {k: "owa", t: "Outlook on the web", s: "Work or school account (Microsoft 365)", u: function(b){ return "https://outlook.office.com/mail/deeplink/compose?to=" + E(TO) + "&" + q3(b); }},
-      {k: "olcom", t: "Outlook.com", s: "Personal Outlook / Hotmail account", u: function(b){ return "https://outlook.live.com/mail/0/deeplink/compose?to=" + E(TO) + "&" + q3(b); }},
-      {k: "gmailweb", t: "Gmail", s: "In your browser", u: function(b){ return "https://mail.google.com/mail/?view=cm&fs=1&to=" + E(TO) + "&su=" + E(b.subject) + "&body=" + E(b.body.replace(/\n/g, "\r\n")); }},
-      {k: "other", t: "Open my email app again", s: "Outlook, Apple Mail, Thunderbird…", u: mailto},
-      {k: "copy", t: "Copy the order", s: "Paste it into a reply to our email"}
-    ];
+  /* ---- Send opens the customer's own email app (mailto: – the phone or computer decides which app) ---- */
+  var E = encodeURIComponent;
+  function mailto(b){ return "mailto:" + TO + "?subject=" + E(b.subject) + "&body=" + E(b.body.replace(/\n/g, "\r\n")); }
   var last = null;
-  OPTS.forEach(function(o){
-    var bt = el("button", "opt"); bt.type = "button"; bt.id = "opt-" + o.k;
-    var lab = el("div", null, o.t); lab.appendChild(el("span", null, o.s)); bt.appendChild(lab);
-    bt.addEventListener("click", function(){
-      if(!last) return;
-      if(o.k === "copy"){ copy(); return; }
-      openWith(o.u(last), /again/.test(o.t) ? "" : o.t);   /* opens the chosen app with the email ready; this page stays */
-    });
-    $("opts").appendChild(bt);
-  });
-  function openWith(url, app){
+  function openWith(url){
     var ok = $("opened"); ok.innerHTML = "";
-    ok.appendChild(el("b", null, "Your order is ready in " + (app || "your email app") + " – press Send there to place it."));
+    ok.appendChild(el("b", null, "Your email app has opened – press Send there to place the order."));
     ok.appendChild(el("div", "small", "To orders@greenlineaustralia.com.au, subject \"Re: Time to restock? … Ref " + D.ref + "\"."));
-    location.href = url;   /* opens the email app; this page stays */
+    location.href = url;   /* this page stays */
   }
   function copy(){
     var t = last.body, msg = $("copied");
@@ -245,10 +214,11 @@ textarea.input{resize:vertical;min-height:64px}
     if(!b.picked.length && !b.also){ err.textContent = "Please put a quantity next to at least one product, or write what you need under \"something else\"."; err.hidden = false; return; }
     last = b; $("sum").textContent = b.body; $("copied").textContent = "";
     $("form").hidden = true; $("pick").hidden = false; window.scrollTo(0, 0);
-    openWith(mailto(b), "");   /* the customer's usual email app, straight away */
+    openWith(mailto(b));
   });
+  $("copy").addEventListener("click", function(){ if(last) copy(); });
   $("back").addEventListener("click", function(){ $("pick").hidden = true; $("form").hidden = false; });
-  window.__order = {data: D, build: build, mailto: mailto, opts: OPTS, platform: isAndroid ? "android" : isIOS ? "ios" : "desktop"};   /* for testing only */
+  window.__order = {data: D, build: build, mailto: mailto};   /* for testing only */
 })();
 </script>
 </body>
