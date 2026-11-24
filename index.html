@@ -27,12 +27,13 @@ p{margin:0}
 .ref{font-size:13px;color:var(--mute);margin-top:-6px}
 /* the product list – same look as the email: no. | code / name + size / usually N | quantity */
 .lines{display:grid}
-.ln{display:grid;grid-template-columns:26px minmax(0,1fr) auto;grid-template-areas:"no nm nm" "no meta step";gap:4px 8px;align-items:center;padding:10px 2px 10px 4px;border-top:1px solid var(--line)}
-.ln .no{grid-area:no;align-self:start}
+.ln{display:grid;grid-template-columns:26px minmax(0,1fr) auto;grid-template-areas:"no code code" "no nm nm" "no meta step";gap:2px 8px;align-items:center;padding:10px 2px 10px 4px;border-top:1px solid var(--line)}
+.ln .no{grid-area:no;align-self:start;padding-top:20px}
 .ln .nm{grid-area:nm}
+.ln .code{grid-area:code;font-size:13px;line-height:18px;color:var(--mute);overflow-wrap:anywhere}
 .ln .meta{grid-area:meta;min-width:0}
 .ln .step{grid-area:step}
-@media (min-width:560px){.ln{grid-template-columns:28px minmax(0,1fr) auto;grid-template-areas:"no nm step" "no meta step";gap:2px 10px}}
+@media (min-width:560px){.ln{grid-template-columns:28px minmax(0,1fr) auto;grid-template-areas:"no code step" "no nm step" "no meta step";gap:2px 10px}}
 .ln.on{background:var(--amber-l)}
 .ln .no{font-weight:bold;font-size:16px;line-height:21px;font-variant-numeric:tabular-nums}
 .ln .meta{font-size:13px;line-height:18px;color:var(--mute);overflow-wrap:anywhere}
@@ -144,7 +145,8 @@ textarea.input{resize:vertical;min-height:64px}
     var r = el("div", "ln");
     var no = el("span", "no", String(L.no));
     var nm = el("div", "nm"); if(L.name) nm.appendChild(document.createTextNode(L.name + " ")); nm.appendChild(el("b", null, L.size));
-    var meta = el("div", "meta", (L.code ? L.code + " · " : "") + "usually " + L.usual);
+    var code = el("div", "code", L.code || "");
+    var meta = el("div", "meta", "usually " + L.usual);
     var st = el("div", "step");
     var minus = el("button", null, "−"); minus.type = "button"; minus.setAttribute("aria-label", "Less of line " + L.no);
     var q = el("input", "qty"); q.type = "number"; q.id = "q" + L.no; q.min = "0"; q.max = "999"; q.step = "1"; q.inputMode = "numeric"; q.placeholder = "0"; q.autocomplete = "off";
@@ -157,7 +159,7 @@ textarea.input{resize:vertical;min-height:64px}
     q.addEventListener("input", function(){ sync(L); });
     q.addEventListener("focus", function(){ setTimeout(function(){ try{ q.select(); }catch(e){} }, 0); });   /* typing replaces the number */
     q.addEventListener("blur", function(){ setQ(L, qOf(L)); });
-    r.appendChild(no); r.appendChild(nm); r.appendChild(meta); r.appendChild(st);
+    r.appendChild(no); r.appendChild(code); r.appendChild(nm); r.appendChild(meta); r.appendChild(st);
     return r;
   }
   var mainL = D.lines.filter(function(L){ return !L.also; }), alsoL = D.lines.filter(function(L){ return L.also; });
